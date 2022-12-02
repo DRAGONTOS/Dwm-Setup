@@ -1,2 +1,11 @@
-# Dwm-Setup
-This is my Dwm setup and xinit scripts.
+## Project Purpose
+My Dwm and scripts.
+
+## Update Log
+
+
+## Contributors
+- DRAGONTOS
+
+## Goals
+ - ?
