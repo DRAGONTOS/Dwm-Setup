@@ -1,0 +1,6 @@
+<a name="L-21--2f-bin-2f-sh"></a>
+<h1>!/bin/sh</h1>
+
+<p>echo # if $(cat theme.h | cut -d' &lsquo; -f3 | sed &ldquo;s/^/defined /;s/$/ ||/&rdquo; | tr &ldquo;\n&rdquo; &ldquo; &rdquo;) 0 > theme_beg.h
+echo -e &ldquo;# error (conflicting macro names)\n# endif&rdquo; >> theme_beg.h
+cat theme.h | cut -d&rsquo; &lsquo; -f3 | sed &ldquo;s/^/# undef /;&rdquo; > theme_end.h</p>

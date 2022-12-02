@@ -1,0 +1,22 @@
+#---System Control---#
+# Restart hotkey damon
+super + shift + x
+  killall sxhkd && sxhkd &
+super + Return
+  alacritty &
+super + b
+  firefox &
+XF86MonBrightnessUp
+  light -A 10 &
+XF86MonBrightnessDown
+  light -U 10 &
+super + F8
+  alacritty -e pulsemixer
+super + shift + F8
+  alacritty -e htop &
+super + F9
+  alacritty -e sudo dmenumount &
+super + F10
+  alacritty -e sudo dmenuumount &
+super + F7
+  obs &

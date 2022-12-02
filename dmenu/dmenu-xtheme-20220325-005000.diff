@@ -1,0 +1,171 @@
+diff --git a/Makefile b/Makefile
+index a03a95c..4ccdf8d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -17,19 +17,26 @@ options:
+ .c.o:
+ 	$(CC) -c $(CFLAGS) $<
+ 
+-config.h:
+-	cp config.def.h $@
++theme.h:
++	./xtheme
+ 
+-$(OBJ): arg.h config.h config.mk drw.h
++theme_beg.h:
++	./themesetup
++
++config.h: theme.h
++	cp -n config.def.h $@
++
++$(OBJ): arg.h config.h config.mk drw.h theme_beg.h
+ 
+ dmenu: dmenu.o drw.o util.o
+ 	$(CC) -o $@ dmenu.o drw.o util.o $(LDFLAGS)
++	rm -f theme_{beg,end}.h
+ 
+ stest: stest.o
+ 	$(CC) -o $@ stest.o $(LDFLAGS)
+ 
+ clean:
+-	rm -f dmenu stest $(OBJ) dmenu-$(VERSION).tar.gz
++	rm -f dmenu stest $(OBJ) theme_{beg,end}.h dmenu-$(VERSION).tar.gz
+ 
+ dist: clean
+ 	mkdir -p dmenu-$(VERSION)
+diff --git a/config.def.h b/config.def.h
+index 1edb647..c072c86 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -1,17 +1,19 @@
+ /* See LICENSE file for copyright and license details. */
+ /* Default settings; can be overriden by command line. */
+ 
+-static int topbar = 1;                      /* -b  option; if 0, dmenu appears at bottom     */
++/* theme management */
++# include "theme_beg.h" /* this is a compile-time generated header file */
++# include "theme.h"
++
++static int topbar = DMENU_TOPBAR;                      /* -b  option; if 0, dmenu appears at bottom     */
+ /* -fn option overrides fonts[0]; default X11 font or font set */
+-static const char *fonts[] = {
+-	"monospace:size=10"
+-};
++static const char *fonts[] = DMENU_FONTS;
+ static const char *prompt      = NULL;      /* -p  option; prompt to the left of input field */
+ static const char *colors[SchemeLast][2] = {
+ 	/*     fg         bg       */
+-	[SchemeNorm] = { "#bbbbbb", "#222222" },
+-	[SchemeSel] = { "#eeeeee", "#005577" },
+-	[SchemeOut] = { "#000000", "#00ffff" },
++	[SchemeNorm] = { DMENU_FOREGROUND, DMENU_BACKGROUND },
++	[SchemeSel] = { DMENU_SELFOREGROUND, DMENU_SELBACKGROUND },
++	[SchemeOut] = { DMENU_OUTFOREGROUND, DMENU_OUTBACKGROUND },
+ };
+ /* -l option; if nonzero, dmenu uses vertical list with given number of lines */
+ static unsigned int lines      = 0;
+@@ -21,3 +23,6 @@ static unsigned int lines      = 0;
+  * for example: " /?\"&[]"
+  */
+ static const char worddelimiters[] = " ";
++
++/* theme management */
++# include "theme_end.h" /* this is a compile-time generated header file */
+diff --git a/theme.h b/theme.h
+new file mode 100644
+index 0000000..e25c106
+--- /dev/null
++++ b/theme.h
+@@ -0,0 +1,8 @@
++# define DMENU_TOPBAR 1
++# define DMENU_FONTS {"monospace:size=10"}
++# define DMENU_FOREGROUND "#839496"
++# define DMENU_BACKGROUND "#002b36"
++# define DMENU_SELFOREGROUND "#002b36"
++# define DMENU_SELBACKGROUND "#839496"
++# define DMENU_OUTFOREGROUND "#000000"
++# define DMENU_OUTBACKGROUND "#00ffff"
+diff --git a/themesetup b/themesetup
+new file mode 100755
+index 0000000..e8710c1
+--- /dev/null
++++ b/themesetup
+@@ -0,0 +1,5 @@
++#!/bin/sh
++
++echo \# if $(cat theme.h | cut -d' ' -f3 | sed "s/^/defined /;s/$/ ||/" | tr "\n" " ") 0 > theme_beg.h
++echo -e "# error (conflicting macro names)\n# endif" >> theme_beg.h
++cat theme.h | cut -d' ' -f3 | sed "s/^/# undef /;" > theme_end.h
+diff --git a/xtable.md b/xtable.md
+new file mode 100644
+index 0000000..cda7c05
+--- /dev/null
++++ b/xtable.md
+@@ -0,0 +1,10 @@
++|	TYPE	|	RESOURCE		|	DEFAULT VALUE			|	[ALTERNATIVE RESOURCE]	|
++|:---------:|:-----------------:|:-------------------------:|:-------------------------:|
++|	I		|	topbar			|	1						|							|
++|	SA		|	fonts			|	monospace:size=10		|							|
++|	S		|	foreground		|	#bbbbbb					|							|
++|	S		|	background		|	#222222					|							|
++|	S		|	selforeground	|	#eeeeee					|	background				|
++|	S		|	selbackground	|	#005577					|	foreground				|
++|	S		|	outforeground	|	#000000					|							|
++|	S		|	outbackground	|	#00ffff					|							|
+diff --git a/xtheme b/xtheme
+new file mode 100755
+index 0000000..4cc3067
+--- /dev/null
++++ b/xtheme
+@@ -0,0 +1,51 @@
++#!/bin/sh
++
++prefix=dmenu
++themeout=theme.h
++xtable=xtable.md
++
++rm -f $themeout
++
++set_resource ()
++{
++	T=$1
++	M=$2
++	V=$3
++
++	case $T in
++		S)
++			V=\"$V\"
++			;;
++		SA)
++			V="{\"$(echo $V | sed 's/, /", "/g')\"}"
++	esac
++
++	[[ $V == '{""}' ]] && V="{}"
++
++	echo "# define $M $V" >> $themeout
++}
++
++cat "$xtable"											|
++	sed '1,2d;s/\t*|\t*/|/g;s/\(^|\)\|\(|$\)//g'		|
++	while IFS='|' read T R D A
++	do
++		m=$(echo "$prefix"'_'"$R" | tr '[:lower:]' '[:upper:]')
++
++		l=''
++
++		for r in "$R" "$A"
++		do
++			[[ "$r" == '' ]] && continue
++
++			l=$(xgetres "$prefix.$r")
++
++			if [[ "$l" != '' ]]
++			then
++				set_resource $T $m "$l"
++				break
++			fi
++		done
++
++		[[ "$l" == '' ]] &&
++			set_resource $T $m "$D"
++	done

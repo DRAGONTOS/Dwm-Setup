@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo \# if $(cat theme.h | cut -d' ' -f3 | sed "s/^/defined /;s/$/ ||/" | tr "\n" " ") 0 > theme_beg.h
+echo -e "# error (conflicting macro names)\n# endif" >> theme_beg.h
+cat theme.h | cut -d' ' -f3 | sed "s/^/# undef /;" > theme_end.h

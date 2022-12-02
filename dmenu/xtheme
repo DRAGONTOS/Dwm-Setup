@@ -1,0 +1,51 @@
+#!/bin/sh
+
+prefix=dmenu
+themeout=theme.h
+xtable=xtable.md
+
+rm -f $themeout
+
+set_resource ()
+{
+	T=$1
+	M=$2
+	V=$3
+
+	case $T in
+		S)
+			V=\"$V\"
+			;;
+		SA)
+			V="{\"$(echo $V | sed 's/, /", "/g')\"}"
+	esac
+
+	[[ $V == '{""}' ]] && V="{}"
+
+	echo "# define $M $V" >> $themeout
+}
+
+cat "$xtable"											|
+	sed '1,2d;s/\t*|\t*/|/g;s/\(^|\)\|\(|$\)//g'		|
+	while IFS='|' read T R D A
+	do
+		m=$(echo "$prefix"'_'"$R" | tr '[:lower:]' '[:upper:]')
+
+		l=''
+
+		for r in "$R" "$A"
+		do
+			[[ "$r" == '' ]] && continue
+
+			l=$(xgetres "$prefix.$r")
+
+			if [[ "$l" != '' ]]
+			then
+				set_resource $T $m "$l"
+				break
+			fi
+		done
+
+		[[ "$l" == '' ]] &&
+			set_resource $T $m "$D"
+	done
