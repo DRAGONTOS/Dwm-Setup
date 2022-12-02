@@ -15,4 +15,4 @@ xrandr --auto &
 ##
 # Window Manager >-<
 ##
-exec /home/rander/.config/suckless/dwm/dwm
+exec /home/rander/.config/Dwm-Setup/dwm/dwm
