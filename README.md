@@ -2,10 +2,16 @@
 My Dwm and scripts.
 
 ## Comments
-To build the dwm, dwmblocks & st
-you need to enter said files and 'sudo make clean build' them.
+To Install everything.
+Git clone this in ~/.config and run ./setuptui.sh
 
 ## Update Log
+### Fixed compiling issues / Added features
++ Dmenu can now be compiled.
++ Added verticle text to dmenu.
++ Added colors and Jetbrain text to dmenu.
++ Added install tui.
+
 ### Fixed Color visablity
 + dwm/config.h
 
@@ -16,4 +22,4 @@ you need to enter said files and 'sudo make clean build' them.
 - DRAGONTOS
 
 ## Goals
- - ?
+ - Add tui [REACHED]

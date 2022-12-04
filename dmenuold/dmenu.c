@@ -1,3 +1,4 @@
+
 /* See LICENSE file for copyright and license details. */
 #include <ctype.h>
 #include <locale.h>
@@ -152,7 +153,7 @@ drawitem(struct item *item, int x, int y, int w)
 	else
 		drw_setscheme(drw, scheme[SchemeNorm]);
 
-	return drw_text(drw, x, y, w, bh, lrpad / 2, item->text, 0);
+	/*return drw_text(drw, 0, y, mw, bh, item->text, 0);*/
 }
 
 static void
@@ -838,3 +839,4 @@ main(int argc, char *argv[])
 
 	return 1; /* unreachable */
 }
+

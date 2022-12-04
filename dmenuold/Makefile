@@ -17,19 +17,26 @@ options:
 .c.o:
 	$(CC) -c $(CFLAGS) $<
 
-config.h:
-	cp config.def.h $@
+theme.h:
+	./xtheme
 
-$(OBJ): arg.h config.h config.mk drw.h
+theme_beg.h:
+	./themesetup
+
+config.h: theme.h
+	cp -n config.def.h $@
+
+$(OBJ): arg.h config.h config.mk drw.h theme_beg.h
 
 dmenu: dmenu.o drw.o util.o
 	$(CC) -o $@ dmenu.o drw.o util.o $(LDFLAGS)
+	rm -f theme_{beg,end}.h
 
 stest: stest.o
 	$(CC) -o $@ stest.o $(LDFLAGS)
 
 clean:
-	rm -f dmenu stest $(OBJ) dmenu-$(VERSION).tar.gz
+	rm -f dmenu stest $(OBJ) theme_{beg,end}.h dmenu-$(VERSION).tar.gz
 
 dist: clean
 	mkdir -p dmenu-$(VERSION)
