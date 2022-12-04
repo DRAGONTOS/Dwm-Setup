@@ -32,9 +32,9 @@ gettingrequiredpkgs() {
 		--no-button "Exit" \
 		--yesno "This will install all needed pkgs" 8 70
 		## pkgs
-	#pacman -R dmenu &
-	#pacman -S sxhkd &
-	#yay -S picom-tryone-git &
+	pacman -R --noconfirm dmenu &
+	pacman -S --noconfirm sxhkd &
+	yay -S --noconfirm picom-tryone-git &
 }
 
 copyfiles() {
@@ -42,11 +42,11 @@ copyfiles() {
 		--no-button "Exit" \
 		--yesno "This will copy all Required files." 8 70
 		## Deleting files
-	#rm -rf ~/.xinitrc
+	rm -rf ~/.xinitrc
 		## Copying files
 	cp -r ~/.config/Dwm-Setup/picom ~/.config &
-	#cp -r ~/.config/Dwm-Setup/.xinitrc ~/.xinitrc &
-	#cp -r ~/.config/Dwm-Setup/sxhkd ~/.config &
+	cp -r ~/.config/Dwm-Setup/.xinitrc ~/.xinitrc &
+	cp -r ~/.config/Dwm-Setup/sxhkd ~/.config &
 }
 
 makepkgs() {
@@ -57,10 +57,12 @@ makepkgs() {
 	cd ~/.config/Dwm-Setup/dmenu && sudo make clean install >/dev/null 2>&1 &
 	cd ~/.config/Dwm-Setup/dwmblocks && sudo make clean install >/dev/null 2>&1 &
 }
+
 success() {
 	whiptail --title "Success!" \
 		--msgbox "All is done!" 10 60
 }
+
 # Welcome user.
 welcomemsg || error "User exited."
 
@@ -70,14 +72,8 @@ gettingrequiredpkgs || error "User exited."
 # Copying Required files.
 copyfiles || error "User exited."
 
-# Give warning if user already exists.
+# Making pkgs.
 makepkgs || error "User exited."
 
-# Last chance for user to back out before install.
+# Success.
 success || error "User exited."
-
-### The rest of the script requires no user input.
-
-# Refresh Arch keyrings.
-#refreshkeys ||
-#	error "Error automatically refreshing Arch keyring. Consider doing so manually."
