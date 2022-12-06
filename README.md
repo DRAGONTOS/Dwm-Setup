@@ -3,9 +3,17 @@ My Dwm and scripts.
 
 ## Comments
 To Install everything.
-Git clone this in ~/.config and run ./setuptui.sh
+Git clone this in ~/.config and run 'sh setuptui.sh'
 
 ## Update Log
+### Added Functional Tui
++ setuptui.sh
++ script/aurinstallremove.sh
++ script/copy.sh
++ script/make.sh
++ script/pacmaninstallremove.sh
++ script/sysact.sh
+
 ### Fixed compiling issues / Added features
 + Dmenu can now be compiled.
 + Added verticle text to dmenu.

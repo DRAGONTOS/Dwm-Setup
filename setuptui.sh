@@ -21,20 +21,40 @@ error() {
 welcomemsg() {
 	whiptail --title "Welcome!" \
 		--msgbox "Welcome to Kaley's Auto Setup Script!\\n\\nThis script will automatically install all dependencies, and will build all Suckless Utils." 10 60
-
+	#Note
 	whiptail --title "Important Note!" --yes-button "All ready!" \
 		--no-button "Return..." \
 		--yesno "This will delete all Pre-Existing Dwm & Dmenu configs." 8 70
 }
 
 gettingrequiredpkgs() {
-	whiptail --title "Installing Required pkgs!" --yes-button "Continue" \
-		--no-button "Exit" \
-		--yesno "This will install all needed pkgs" 8 70
-		## pkgs
-	pacman -R --noconfirm dmenu &
-	pacman -S --noconfirm sxhkd &
-	yay -S --noconfirm picom-tryone-git &
+    psw=$(whiptail --title "Installing Required pkgs!" --passwordbox "Enter your password and choose Ok to continue." 10 60 3>&1 1>&2 2>&3)
+    #Password If
+    exitstatus=$?
+    if [ $exitstatus = 0 ]; then
+        sudo -S <<< $psw sudo -s ./scripts/pacmaninstallremove.sh &
+    else
+        #Password If cancel
+        whiptail --title "Cancel" --msgbox "Operation Cancel" 10 60
+    fi
+
+	#timer
+    	for i in {1..100}; do
+   		echo $i
+   		sleep 0.2
+	done | whiptail --gauge "Please Wait...." 10 50 0
+
+	#AUR pkgs Installer
+    	whiptail --title "Installing AUR pkgs!" --yes-button "Continue" \
+	    --no-button "Exit" \
+	    --yesno "This will install all needed AUR pkgs." 8 70
+    	sh ./scripts/aurinstallremove.sh &
+
+	#timer
+    	for i in {1..100}; do
+   		echo $i
+   		sleep 0.2
+	done | whiptail --gauge "Please Wait...." 10 50 0
 }
 
 copyfiles() {
@@ -42,20 +62,25 @@ copyfiles() {
 		--no-button "Exit" \
 		--yesno "This will copy all Required files." 8 70
 		## Deleting files
-	rm -rf ~/.xinitrc
-		## Copying files
-	cp -r ~/.config/Dwm-Setup/picom ~/.config &
-	cp -r ~/.config/Dwm-Setup/.xinitrc ~/.xinitrc &
-	cp -r ~/.config/Dwm-Setup/sxhkd ~/.config &
+	sh ./scripts/copy.sh &
 }
 
 makepkgs() {
-	whiptail --title "Making pkgs!" --yes-button "Continue" \
-		--no-button "Exit" \
-		--yesno "This will compile all pkgs." 8 70
-	cd ~/.config/Dwm-Setup/dwm && sudo make clean install >/dev/null 2>&1 &
-	cd ~/.config/Dwm-Setup/dmenu && sudo make clean install >/dev/null 2>&1 &
-	cd ~/.config/Dwm-Setup/dwmblocks && sudo make clean install >/dev/null 2>&1 &
+    psw=$(whiptail --title "Making pkgs!" --passwordbox "Enter your password and choose Ok to continue." 10 60 3>&1 1>&2 2>&3)
+    #Password If
+    exitstatus=$?
+    if [ $exitstatus = 0 ]; then
+        sudo -S <<< $psw sudo -s ./scripts/make.sh &
+    else
+        #Password If cancel
+        whiptail --title "Cancel" --msgbox "Operation Cancel" 10 60
+    fi
+
+	#timer
+        for i in {1..100}; do
+   		echo $i
+   		sleep 0.15
+	done | whiptail --gauge "Please Wait...." 10 50 0
 }
 
 success() {
